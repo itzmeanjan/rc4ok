@@ -1,11 +1,11 @@
 #[derive(Copy, Clone)]
-pub struct Rc4ok {
+pub struct RC4ok {
     s: [u8; 256],
     j: u32,
     i: u8,
 }
 
-impl Rc4ok {
+impl RC4ok {
     #[inline(always)]
     pub fn init(key: &[u8]) -> Self {
         let mut state = Self {
@@ -26,6 +26,17 @@ impl Rc4ok {
         self.prga(out);
     }
 
+    #[inline(always)]
+    pub fn add_entropy(&mut self, entropy: u16) {
+        let mut jw1 = (self.j >> 16) as u16;
+
+        jw1 = jw1.rotate_left(1);
+        jw1 = jw1.wrapping_add(entropy);
+
+        const MASK: u32 = 0x0000ffff;
+        self.j = (self.j & MASK) | ((jw1 as u32) << 16);
+    }
+
     // Pseudo Random Generation Algorithm
     #[inline(always)]
     fn prga(&mut self, out: &mut [u8]) {
@@ -36,10 +47,7 @@ impl Rc4ok {
             self.i = self.i.wrapping_add(11);
             self.j = self.j.rotate_left(1);
 
-            #[cfg(target_endian = "little")]
             let mut j0 = self.j as u8;
-            #[cfg(target_endian = "big")]
-            let mut j0 = self.j.swap_bytes() as u8;
 
             j0 = j0.wrapping_add(self.s[self.i as usize]);
 
