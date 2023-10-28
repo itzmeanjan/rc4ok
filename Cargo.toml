@@ -1,0 +1,14 @@
+[package]
+name = "rc4ok"
+version = "0.1.0"
+edition = "2021"
+authors = ["Anjan Roy <hello@itzmeanjan.in>"]
+description = "Lightweight High-Performance Cryptographically Strong Random Number Generator"
+documentation = "https://github.com/itzmeanjan/rc4ok"
+readme = "README.md"
+repository = "https://github.com/itzmeanjan/rc4ok.git"
+license = "MIT"
+keywords = ["cryptography", "prng", "rng", "stream-cipher", "rc4"]
+categories = ["cryptography"]
+
+[dependencies]
