@@ -1,7 +1,8 @@
 /// RC4OK is a lightweight high-performance cryptographically strong random
 /// number generator based on an improved variant of RC4 stream cipher.
 ///
-/// Note, classic RC4 is considered deprecated. The improvement RC4OK is proposed in https://ia.cr/2023/1486.
+/// Note, classic RC4 is considered deprecated. The improved RC4OK scheme is proposed in https://ia.cr/2023/1486.
+/// This implementation collects inspiration from reference implementation https://github.com/emercoin/rc4ok/blob/09f0724f/rc4ok.c.
 #[derive(Copy, Clone)]
 pub struct RC4ok {
     s: [u8; 256],
@@ -27,7 +28,7 @@ impl RC4ok {
         // Ignore first 256 -bytes output of RC4OK psuedo random number generator.
         let mut dump = [0u8; 256];
         state.prga(&mut dump);
-        // This line can be optimized away, is it a "security" problem ?
+        // This line can be optimized away by the compiler, is that a "security" problem ?
         dump.fill(0x00);
 
         state
@@ -80,14 +81,33 @@ impl RC4ok {
 
         j = 0;
         i = 0;
-        while i < 256 {
-            j = (j + self.s[i] as usize + key[i % klen] as usize) % 256;
 
-            self.s[i] ^= self.s[j];
-            self.s[j] ^= self.s[i];
-            self.s[i] ^= self.s[j];
+        let br = [256, klen];
+        let n = br[(klen > 256) as usize];
+        let mut k = 0;
 
-            i += 1;
+        while k < n {
+            j = (j
+                + self.s[i] as usize
+                + key[k % klen // If key byte length is power of 2 (non-zero), modulo division is a trivial operation !
+                ] as usize)
+                % 256;
+
+            // swap(self.s[i], self.s[j])
+            //
+            // Possible scenario, i == j, hence cache them in a, b; perform swap; write back.
+            let mut a = self.s[i];
+            let mut b = self.s[j];
+
+            a ^= b;
+            b ^= a;
+            a ^= b;
+
+            self.s[i] = a;
+            self.s[j] = b;
+
+            i = (i + 1) % 256;
+            k += 1;
         }
 
         self.i = self.s[j ^ 85];
@@ -105,17 +125,24 @@ impl RC4ok {
 
         while idx < olen {
             self.i = self.i.wrapping_add(11);
-            self.j = self.j.rotate_left(1);
+            let mut a = self.s[self.i as usize];
 
-            let mut j0 = self.j as u8;
+            self.j = self.j.rotate_left(1).wrapping_add(a as u32);
 
-            j0 = j0.wrapping_add(self.s[self.i as usize]);
+            let j0 = self.j as u8;
+            let mut b = self.s[j0 as usize];
 
-            self.s[self.i as usize] ^= self.s[j0 as usize];
-            self.s[j0 as usize] ^= self.s[self.i as usize];
-            self.s[self.i as usize] ^= self.s[j0 as usize];
+            // swap(self.s[self.i], self.s[j0])
+            //
+            // Possible scenario, self.i == j0, hence cache them in a, b; perform swap; write back.
+            a ^= b;
+            b ^= a;
+            a ^= b;
 
-            let u = self.s[self.i as usize].wrapping_add(self.s[j0 as usize]);
+            self.s[self.i as usize] = a;
+            self.s[j0 as usize] = b;
+
+            let u = a.wrapping_add(b);
             out[idx] = self.s[u as usize];
 
             idx += 1;
