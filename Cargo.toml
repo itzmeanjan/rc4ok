@@ -12,3 +12,7 @@ keywords = ["cryptography", "prng", "rng", "stream-cipher", "rc4"]
 categories = ["cryptography"]
 
 [dependencies]
+
+[dev-dependencies]
+hex = "=0.4.3"
+rand = "=0.8.5"
