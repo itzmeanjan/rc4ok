@@ -53,6 +53,14 @@ impl RC4ok {
         self.j = (self.j & MASK) | ((jw1 as u32) << 16);
     }
 
+    /// Given already initialized (and probably used too) RC4OK stream cipher object,
+    /// this routine can be invoked for reinitializing it with different key.
+    #[inline(always)]
+    pub fn reset(&mut self, key: &[u8]) {
+        debug_assert!(key.len() > 0, "Key must be non-empty !");
+        *self = Self::init(key);
+    }
+
     /// Key Scheduling Algorithm
     ///
     /// Based on classic RC4 stream cipher's key scheduling algorithm.
