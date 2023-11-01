@@ -33,10 +33,10 @@ fn rc4ok(c: &mut CriterionCPB) {
     while klen <= MAX_KEY_SIZE {
         let mut olen = MIN_OUT_SIZE;
         while olen <= MAX_OUT_SIZE {
-            let mut group = c.benchmark_group(format!("rc4ok/{}/{}", klen, olen));
+            let mut group = c.benchmark_group(format!("rc4ok/{}B key", klen));
             group.throughput(Throughput::Bytes((klen + olen) as u64));
 
-            group.bench_function("(cached)", |bench| {
+            group.bench_function(format!("{}B out (cached)", olen), |bench| {
                 let mut key = vec![0u8; klen];
                 let mut out = vec![0u8; olen];
 
@@ -48,7 +48,7 @@ fn rc4ok(c: &mut CriterionCPB) {
                 })
             });
 
-            group.bench_function("(random)", |bench| {
+            group.bench_function(format!("{}B out (random)", olen), |bench| {
                 let mut key = vec![0u8; klen];
                 let out = vec![0u8; olen];
 
