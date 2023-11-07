@@ -24,6 +24,10 @@ criterion-cycles-per-byte = {git = "https://github.com/itzmeanjan/criterion-cycl
 [lib]
 bench = false
 
+[[bin]]
+name = "rc4ok"
+path = "src/main.rs"
+
 [[bench]]
 name = "rc4ok"
 harness = false
