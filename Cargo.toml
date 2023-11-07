@@ -8,7 +8,7 @@ documentation = "https://github.com/itzmeanjan/rc4ok"
 readme = "README.md"
 repository = "https://github.com/itzmeanjan/rc4ok.git"
 license = "MIT"
-keywords = ["cryptography", "prng", "rng", "stream-cipher", "rc4"]
+keywords = ["cryptography", "prng", "random-number-gen", "stream-cipher", "rc4"]
 categories = ["cryptography"]
 
 [dependencies]
@@ -16,3 +16,18 @@ categories = ["cryptography"]
 [dev-dependencies]
 hex = "=0.4.3"
 rand = "=0.8.5"
+criterion = "=0.5.1"
+
+[target.'cfg(any(target_arch = "x86", target_arch = "x86_64", target_arch = "loongarch64"))'.dev-dependencies]
+criterion-cycles-per-byte = {git = "https://github.com/itzmeanjan/criterion-cycles-per-byte", rev = "2dc25c6"}
+
+[lib]
+bench = false
+
+[[bin]]
+name = "rc4ok"
+path = "src/main.rs"
+
+[[bench]]
+name = "rc4ok"
+harness = false
