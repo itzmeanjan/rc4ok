@@ -202,6 +202,8 @@ Using RC4OK PRNG is fairly easy.
 ```toml
 [dependencies]
 rc4ok = { git = "https://github.com/itzmeanjan/rc4ok" }
+# or
+rc4ok = "0.1.0"
 ```
 
 2) Initialize RC4OK pseudo-random number generator with a non-empty key i.e. seed.
@@ -255,4 +257,16 @@ I'm maintaining a program (see [src/main.rs](./src/main.rs)) which can be invoke
 cargo run --release -- -h                             # For showing help text
 cargo run --release -- -b 256 "this is a seed phrase" # For requesting n (=256) pseudo-random bytes, given a seed string
 cargo run --release -- -s "this is a seed phrase"     # For requesting arbitrary pseudo-random bytes, given a seed string
+
+# --- --- --- --- ---
+
+# Encode output of rc4ok binary executable as hex string onto STDOUT.
+# You may find https://stackoverflow.com/questions/6292645/convert-binary-data-to-hexadecimal-in-a-shell-script helpful.
+cargo run --release -- -b 4 "this is a seed phrase" | od -A n -v -t x1 | tr -d ' \n' && echo -e # Outputs 4 pseudo random bytes
+cargo run --release -- -s "this is a seed phrase" | od -A n -v -t x1 | tr -d ' \n' && echo -e   # Outputs a stream of pseudo random bytes
+
+# Compute SHA256 digest over output of rc4ok binary executable.
+cargo run --release -- -b 256 "this is a seed phrase" | sha256sum               # = 60ca173a786ab694243e274ee67c758cb562310b743a2708bca3b6fb510e2e54
+cargo run --release -- -b 257 "this is a seed phrase" | sha256sum               # = 9051dc85e79360c7afda55551c9811fb52bb2fd8cbcabf791d11fd1a43666c8f
+cargo run --release -- -b 257 "this is a seed phrase" | head -c 256 | sha256sum # = 60ca173a786ab694243e274ee67c758cb562310b743a2708bca3b6fb510e2e54
 ```

@@ -8,7 +8,7 @@ documentation = "https://github.com/itzmeanjan/rc4ok"
 readme = "README.md"
 repository = "https://github.com/itzmeanjan/rc4ok.git"
 license = "MIT"
-keywords = ["cryptography", "prng", "rng", "stream-cipher", "rc4"]
+keywords = ["cryptography", "prng", "random-number-gen", "stream-cipher", "rc4"]
 categories = ["cryptography"]
 
 [dependencies]
