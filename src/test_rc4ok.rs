@@ -35,6 +35,7 @@ fn test_known_answer_tests() {
     }
 }
 
+#[cfg(debug_assertions)]
 #[test]
 #[should_panic(expected = "Key must be non-empty !")]
 fn test_failure_with_empty_key() {
